@@ -1,0 +1,31 @@
+# Configure Kafka Broker​: SASL_PLAINTEXT 
+
+$ sudo nano ~/kafka/config/server.properties  ​
+
+listeners=PLAINTEXT://0.0.0.0:9092,SASL_PLAINTEXT://0.0.0.0:9094​
+advertised.listeners=PLAINTEXT://localhost:9092,SASL_PLAINTEXT://localhost:9094​
+security.inter.broker.protocol=SASL_PLAINTEXT​
+sasl.kerberos.service.name=kafka​
+sasl.enabled.mechanisms=GSSAPI​
+zookeeper.connect=localhost:2181​
+
+​
+
+# Create JAAS file and save it under ~/kafka/config/kafka_server_jaas.conf​
+
+KafkaServer {​
+    com.sun.security.auth.module.Krb5LoginModule required​
+    useKeyTab=true​
+    storeKey=true​
+    keyTab="/home/qolsysjci/kafka/kafka.service.keytab"​
+    principal="kafka/localhost@EXAMPLE.COM";​
+};​
+
+
+
+# Restart Kafka​
+​$ sudo systemctl daemon-reload​
+$ sudo systemctl restart kafka​
+$ sudo systemctl status kafka
+
+​

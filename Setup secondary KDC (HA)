@@ -17,3 +17,49 @@ $ kadmin -q "addprinc -randkey host/kdc2.example.com"​
 ​
 Extract the key file for the kdc2 principal, from the replica server (kdc): ​
 $ sudo kadmin -p ubuntu/admin -q "ktadd host/kdc2.example.com"​
+
+Next, there needs to be a kpropd.acl file on each KDC that lists all KDCs for the realm. For example, on both the primary and secondary KDC, create /etc/krb5kdc/kpropd.acl:​
+
+$ host/kdc1.example.com@EXAMPLE.COM​
+$ host/kdc2.example.com@EXAMPLE.COM​
+
+​Create an empty database on the secondary KDC: ​
+$ sudo kdb5_util create -s​
+
+Now install kpropd daemon, which listens for connections from the kprop utility from the primary KDC:​
+$ sudo apt install krb5-kpropd​
+
+From a terminal on the primary KDC, create a dump file of the principal database: ​
+$ sudo kdb5_util dump /var/lib/krb5kdc/dump​
+
+Still on the Primary KDC, extract its key: sudo kadmin.local -q "ktadd host/kdc1.example.com"​
+On the primary KDC, run the kprop utility to push the database dump made before to the secondary KDC:​
+
+$ sudo kprop -r EXAMPLE.COM -f /var/lib/krb5kdc/dump kdc2.example.com​
+Database propagation to kdc02.example.com: SUCCEEDED
+
+🔁 Verifying KDC Propagation & Setting Up Replication
+After pushing the Kerberos database to the secondary KDC, look for a **SUCCEEDED** message — this confirms the propagation was successful.
+
+❗ If you see an error instead, check the log file on the secondary KDC:
+/var/log/syslog
+
+Automate Database Propagation with Cron
+To keep the secondary KDC updated, set up a cron job to syn the database regularly.
+The following example pushes the database every hour:
+# m  h  dom mon dow   command
+0 * * * * root /usr/sbin/kdb5_util dump /var/lib/krb5kdc/dump && /usr/sbin/kprop -r EXAMPLE.COM -f /var/lib/krb5kdc/dump kdc2.example.com
+
+▶️ Start the Secondary KDC
+Once replication is set up, start the KDC daemon on the secondary server:
+
+$ sudo systemctl start krb5-kdc.service
+
+🧪 Test the Secondary KDC
+To verify it's working:
+Stop the krb5-kdc service on the primary KDC:
+$ sudo systemctl stop krb5-kdc.service
+
+On a client machine, try requesting a Kerberos ticket:
+kinit username@EXAMPLE.COM
+

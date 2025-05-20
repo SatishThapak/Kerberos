@@ -1,0 +1,31 @@
+Installed kafka 3.6.0​
+
+start zookeeper ​
+~/kafka/bin/zookeeper-server-start.sh -daemon ~/kafka/config/zookeeper.properties ​
+
+tail -n 5 ~/kafka/logs/zookeeper.out ​
+echo "ruok" | nc localhost 2181 ;​
+
+
+start Kafka ​
+~/kafka/bin/kafka-server-start.sh -daemon ~/kafka/config/server.properties​
+
+create a test topic​
+~/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic kafka-security-topic --replication-factor 1 --
+partitions 2​
+~/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --describe --topic kafka-security-topic​
+
+
+start Producer​
+~/kafka/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic kafka-security-topic​
+
+​start Consumer​
+~/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic kafka-security-topic​
+
+Normal Kafka is working fine.
+
+
+
+​
+
+​

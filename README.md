@@ -1,4 +1,4 @@
-# Kerberos Setup & Implementation in Kafka, PostgreSQL, and Kerberos High Availability (HA)
+# Kerberos Setup & Implementation in Kafka, MariaDB, PostgreSQL, and Kerberos High Availability (HA)
 For system administrators, DevOps engineers, or architects setting up secure environments.
 
 # Domain Setup

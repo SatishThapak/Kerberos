@@ -1,21 +1,21 @@
-Client:
+# Client:
 The client initiates communication by requesting access to a service on behalf of the user. It acts as the user's agent in the authentication process.
 
-Server:
+# Server:
 This is the host offering the network service the user wants to access. It relies on Kerberos authentication to validate access requests.
 
-Authentication Server (AS):
+# Authentication Server (AS):
 The AS verifies the identity of users during initial login. Upon successful authentication, it issues a Ticket Granting Ticket (TGT), which the client can later use to request access to services without re-authenticating.
 
-Key Distribution Center (KDC):
+# Key Distribution Center (KDC):
 The KDC is the central component of the Kerberos protocol. It combines three logical entities:
 
-Database – stores user and service credentials.
+# Database – stores user and service credentials.
 
-Authentication Server (AS) – handles initial user authentication and TGT issuance.
+# Authentication Server (AS) – handles initial user authentication and TGT issuance.
 
-Ticket Granting Server (TGS) – issues service tickets based on the TGT.
+# Ticket Granting Server (TGS) – issues service tickets based on the TGT.
 These components operate on a single physical server referred to as the Key Distribution Center.
 
-Ticket Granting Server (TGS):
+# Ticket Granting Server (TGS):
 The TGS issues service tickets based on a valid TGT. These tickets allow the client to access specific services securely, without needing to re-authenticate each time.

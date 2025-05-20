@@ -1,0 +1,31 @@
+Let's configure using Kerberos :  
+
+Create principal for users : 
+$ sudo kadmin.local -q "add_principal -randkey reader@EXAMPLE.COM"​
+$ sudo kadmin.local -q "add_principal -randkey writer@EXAMPLE.COM"​
+$ sudo kadmin.local -q "add_principal -randkey admin@EXAMPLE.COM"​
+
+Create principal for service : 
+$ sudo kadmin.local -q "add_principal -randkey kafka/localhost@EXAMPLE.COM"
+
+Create keytabs files for users
+$ sudo kadmin.local -q "xst -kt /tmp/reader.user.keytab reader@EXAMPLE.COM"​
+$ sudo kadmin.local -q "xst -kt /tmp/writer.user.keytab writer@EXAMPLE.COM"​
+$ sudo kadmin.local -q "xst -kt /tmp/admin.user.keytab admin@EXAMPLE.COM"​
+
+Create keytabs files for service.​
+sudo kadmin.local -q "xst -kt /tmp/kafka.service.keytab kafka/localhost@EXAMPLE.COM"
+
+sudo chmod a+r /tmp/*.keytab​
+Download the required keytab files from the Kerberos server to a secure local machine. Then, securely copy the service.keytab (or relevant service principal keytab) to the Kafka server machine.
+
+Now install krb5-user on local machine & kafka server.​
+$ sudo apt-get install -y krb5-user      // Use the same realm name and update krb5.conf file similar to kerberos server.​
+$ sudo nano /etc/krb5.conf 
+
+klist -kt /tmp/kafka.service.keytab​
+kinit -kt /tmp/kafka.service.keytab kafka/localhost
+
+
+
+

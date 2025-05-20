@@ -3,16 +3,115 @@ Install the Kerberos packages
 $ sudo apt install krb5-kdc krb5-admin-server
 
 You will be asked at the end of the install to supply the hostname for the Kerberos and Admin servers for the realm.which may or may not be the same server.
-Next, create the new realm with the kdb5_newrealm utility:
+Next, check the configurations
 
-$ sudo krb5_newrealm
-It will ask you for a database master password, which is used to encrypt the local database.
+​1. Edit: sudo nano /etc/krb5.conf​
 
-Configure the Kerberos server:
-The prompts during installation help set up the /etc/krb5.conf and /etc/krb5kdc/kdc.conf files. The /etc/krb5.conf file is used by the Kerberos 5 libraries, while /etc/krb5kdc/kdc.conf contains the configuration for the Key Distribution Center (KDC). To modify KDC settings, edit the kdc.conf file and restart the krb5-kdc service. If you need to completely reconfigure Kerberos—for example, to change the realm name—you can do so by running:
+​[libdefaults]​
+        default_realm = EXAMPLE.COM​
+[realms]​
+        EXAMPLE.COM = {​
+                kdc = kdc1.example.com​
+                kdc = kdc2.example.com​
+                admin_server = kdc1.example.com​
+        }​
+[domain_realm]​
+      .example.com = EXAMPLE.COM​
+       example.com = EXAMPLE.COM​
 
-$ sudo dpkg-reconfigure krb5-kdc
+2. Edits: sudo nano /etc/krb5kdc/kdc.conf​
 
-Let’s create our first principal (Kerberos user or service identity).
-Since we haven’t created any principals yet, we’ll use kadmin.local. This command talks directly to the KDC using a local UNIX socket and must be run with root privileges (sudo).
+[kdcdefaults]​
+    kdc_ports = 750,88​
+[realms]​
+    EXAMPLE.COM = {​
+        database_name = /var/lib/krb5kdc/principal​
+        admin_keytab = FILE:/etc/krb5kdc/kadm5.keytab​
+        acl_file = /etc/krb5kdc/kadm5.acl​
+        key_stash_file = /etc/krb5kdc/stash​
+        kdc_ports = 750,88​
+        max_life = 10h 0m 0s​
+        max_renewable_life = 7d 0h 0m 0s​
+        master_key_type = aes256-cts​
+        supported_enctypes = aes256-cts:normal aes128-cts:normal​
+        default_principal_flags = +preauth​
+
+    }​
+
+Create the new realm with the kdb5_newrealm utility: ​
+
+$ sudo krb5_newrealm​
+
+Enter KDC database master key: ​
+Re-enter KDC database master key to verify: ​
+
+Note:
+Do not lose this password. It is the master key for the Kerberos database.
+If it is lost, you cannot recover the database, and the only option will be to create a new Kerberos database from scratch.
+Before starting the Kerberos configuration, here are some basic Kerberos tools need to know.​
+
+kadmin.local:  KDC database administration tool used to manage principal and policy.​
+kinit:  used to obtain and cache Kerberos ticket-granting ticket.​
+klist:  used to list principal and tickets held in a credentials cache, or the keys held in a keytab file.​
+ktutil:  used to read, write, or edit entries in a keytab​
+
+# Create the First Principal
+Let’s create our first Kerberos principal (a user or service identity).
+Since no principals exist yet, we’ll use kadmin.local, which communicates with the KDC using a local UNIX socket and requires root privileges:
+
+$ sudo kadmin.local
+Authenticating as principal root/admin@EXAMPLE.COM with password.
+kadmin.local: addprinc ubuntu
+WARNING: no policy specified for ubuntu@EXAMPLE.COM; defaulting to no policy
+Enter password for principal "ubuntu@EXAMPLE.COM": 
+Re-enter password for principal "ubuntu@EXAMPLE.COM": 
+Principal "ubuntu@EXAMPLE.COM" created.
+kadmin.local: quit
+
+# Creating an Admin Principal
+To manage Kerberos remotely using kadmin, we need to create an admin principal.
+
+By convention, admin principals use the format:
+username/admin@REALM
+
+This makes it easier to define permissions later using the Kerberos Access Control List (ACL).
+Let’s create an admin instance for the ubuntu user:
+
+$ sudo kadmin.local
+Authenticating as principal root/admin@EXAMPLE.COM with password.
+kadmin.local: addprinc ubuntu/admin
+WARNING: no policy specified for ubuntu/admin@EXAMPLE.COM; defaulting to no policy
+Enter password for principal "ubuntu/admin@EXAMPLE.COM": 
+Re-enter password for principal "ubuntu/admin@EXAMPLE.COM": 
+Principal "ubuntu/admin@EXAMPLE.COM" created.
+kadmin.local: quit
+
+
+# Set Admin Permissions with ACL
+
+3. Edits: Next, the new admin principal needs to have the appropriate ACL permissions. 
+The permissions are configured in the /etc/krb5kdc/kadm5.acl file:
+ubuntu/admin@EXAMPLE.COM  *
+We can also use a more generic form for this ACL:​
+*/admin@EXAMPLE.COM  *​
+The above will grant all privileges to any admin instance of a principal.​
+
+Now restart the krb5-admin-server for the new ACL to take effect:​
+
+$ sudo systemctl status krb5-kdc.service​
+$ sudo systemctl status krb5-admin-server.service
+
+The new user principle can be tested using the kinit utility:​
+$ kinit ubuntu/admin​
+Password for ubuntu/admin@EXAMPLE.COM:​
+After entering the password, use the klist utility to view information about the Ticket Granting Ticket (TGT):​
+
+$ klist​
+
+Ticket cache: FILE:/tmp/krb5cc_1000​
+Default principal: ubuntu/admin@EXAMPLE.COM​
+Valid starting     Expires            Service principal​
+10/14/24 10:14:28  10/14/24 20:14:28  krbtgt/EXAMPLE.COM@EXAMPLE.COM​
+        renew until 10/15/24 10:14:24
+
 

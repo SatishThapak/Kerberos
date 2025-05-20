@@ -1,0 +1,15 @@
+## Create jaas file on client machine.​
+
+$ sudo nano /tmp/kafka_client_jaas.conf​
+
+KafkaClient {​
+com.sun.security.auth.module.Krb5LoginModule required​
+useTicketCache=true;​
+};​
+
+# Create properties file including Kerberos details​
+save it under  /home/kafka_client/kafka_client_kerberos.properties​
+
+security.protocol=SASL_PLAINTEXT​
+sasl.mechanism=GSSAPI​
+sasl.kerberos.service.name=kafka

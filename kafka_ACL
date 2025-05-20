@@ -1,0 +1,33 @@
+Configure Kafka Broker: ​
+$ sudo nano ~/kafka/config/server.properties​
+
+authorizer.class.name=kafka.security.authorizer.AclAuthorizer​
+allow.everyone.if.no.acl.found=true​
+super.users=User:kafka;User:admin​
+
+check acl's ​
+./kafka-acls.sh --bootstrap-server localhost:9092 --list​
+
+add kafka-security-topic​
+./kafka-acls.sh --bootstrap-server localhost:9092 --add --allow-principal User:admin --operation Read --topic kafka-security-topic​
+./kafka-acls.sh --bootstrap-server localhost:9092 --add --allow-principal User:admin --operation write --topic kafka-security-topic​
+./kafka-acls.sh --bootstrap-server localhost:9092 --add --allow-principal User:admin --operation create --topic kafka-security-topic​
+
+now try to produce messages using user reader. ​
+~/kafka/bin/kafka-console-producer.sh --broker-list localhost:9094 --topic kafka-security-topic --producer.config /home/kafka_client/kafka_client_kerberos.properties​
+
+ACL's test - console-producer/-consumer​
+
+​Terminal 1:​
+export KAFKA_OPTS="-Djava.security.auth.login.config=/home/qolsysjci/kafka_client/kafka_client_jaas.conf"​
+kinit -kt /tmp/reader.user.keytab reader​
+~/kafka/bin/kafka-console-producer.sh --broker-list localhost:9094 --topic kafka-security-topic --producer.config /home/kafka_client/kafka_client_kerberos.properties​
+
+​
+
+Terminal 2:​
+export KAFKA_OPTS="-Djava.security.auth.login.config=/home/qolsysjci/kafka_client/kafka_client_jaas.conf"​
+kinit -kt /tmp/reader.user.keytab reader​
+~/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9094 --topic kafka-security-topic --consumer.config /home/kafka_client/kafka_client_kerberos.properties​
+
+​

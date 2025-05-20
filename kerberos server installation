@@ -1,0 +1,18 @@
+Install the Kerberos packages
+
+$ sudo apt install krb5-kdc krb5-admin-server
+
+You will be asked at the end of the install to supply the hostname for the Kerberos and Admin servers for the realm.which may or may not be the same server.
+Next, create the new realm with the kdb5_newrealm utility:
+
+$ sudo krb5_newrealm
+It will ask you for a database master password, which is used to encrypt the local database.
+
+Configure the Kerberos server:
+The prompts during installation help set up the /etc/krb5.conf and /etc/krb5kdc/kdc.conf files. The /etc/krb5.conf file is used by the Kerberos 5 libraries, while /etc/krb5kdc/kdc.conf contains the configuration for the Key Distribution Center (KDC). To modify KDC settings, edit the kdc.conf file and restart the krb5-kdc service. If you need to completely reconfigure Kerberos—for example, to change the realm name—you can do so by running:
+
+$ sudo dpkg-reconfigure krb5-kdc
+
+Let’s create our first principal (Kerberos user or service identity).
+Since we haven’t created any principals yet, we’ll use kadmin.local. This command talks directly to the KDC using a local UNIX socket and must be run with root privileges (sudo).
+

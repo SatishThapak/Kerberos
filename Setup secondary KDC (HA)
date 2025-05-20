@@ -1,0 +1,19 @@
+# Install the required packages
+First, install the packages, and when asked for the Kerberos and Admin server names enter the name of the Primary KDC:
+
+Configure replica KDCs​
+Note: When installing a replica KDC, the hostname and admin server name should match those of the master KDC.​
+Database propagation copies the contents of the primary database but does not propagate configuration files, ​
+stash files, or the kadm5 ACL file. The following files must be copied by hand to each replica                       ​
+krb5.conf​
+kdc.conf​
+kadm5.acl​
+master key stash file​
+
+Once you have installed the packages, create the host principals for both KDCs. ​
+
+$ kadmin -q "addprinc -randkey host/kdc1.example.com"​
+$ kadmin -q "addprinc -randkey host/kdc2.example.com"​
+​
+Extract the key file for the kdc2 principal, from the replica server (kdc): ​
+$ sudo kadmin -p ubuntu/admin -q "ktadd host/kdc2.example.com"​

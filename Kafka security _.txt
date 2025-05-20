@@ -1,0 +1,25 @@
+Encryption of data using SSL / TLS: uses both asymmetric and symmetric encryption to protect the
+confidentiality and integrity of data-in-transit. Asymmetric encryption is used to establish a secure
+session between a client and a server, and symmetric encryption is used to exchange data within the
+secured session.​
+
+Authentication using SSL or SASL: (Simple Authentication and Security Layer,) is a framework that
+provides a standard interface for authentication protocols. It is designed to decouple authentication
+mechanisms from application protocols, allowing various authentication mechanisms to be used with
+different applications ​
+
+Authorization using ACLs: Access Control List, is a security feature in Apache Kafka that allows
+administrators to control and restrict access to Kafka resources. ACLs help enforce authorization
+policies by specifying what actions different users or client applications are allowed to perform on
+Kafka topics.​
+
+Kafka supports the following SASL mechanisms: ​
+
+SASL/GSSAPI (Kerberos) - starting at version 0.9.0.0​
+SASL/PLAIN - starting at version 0.10.0.0​
+SASL/SCRAM-SHA-256 and SASL/SCRAM-SHA-512 - starting at version 0.10.2.0​
+SASL/OAUTHBEARER - starting at version 2.0​
+
+​
+
+​

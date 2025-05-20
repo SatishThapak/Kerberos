@@ -4,11 +4,11 @@ For system administrators, DevOps engineers, or architects setting up secure env
 # Domain Setup
 We’re going to set up an MIT Kerberos domain with the following details (you can modify these to suit your environment):
 
-Realm: EXAMPLE.COM
-Primary KDC (main server): kdc1.example.com
-Secondary KDC (backup server): kdc2.example.com
-User account (principal): ubuntu
-Admin account (principal): ubuntu/admin
+# Realm: EXAMPLE.COM
+# Primary KDC (main server): kdc1.example.com
+# Secondary KDC (backup server): kdc2.example.com
+# User account (principal): ubuntu
+# Admin account (principal): ubuntu/admin
 
 # 🛠️ Prerequisites
 Before installing the Kerberos server, ensure the following:
